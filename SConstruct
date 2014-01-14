@@ -18,8 +18,12 @@ options = Variables()
 options.Add( EnumVariable('platform',
                         'Platform (compiler/stl) used to build the project',
                         'msvc71',
-                        allowed_values='suncc vacpp mingw msvc6 msvc7 msvc71 msvc80 linux-gcc'.split(),
+                        allowed_values='suncc vacpp mingw msvc6 msvc7 msvc71 msvc80 msvc100 linux-gcc'.split(),
                         ignorecase=2) )
+options.Add( EnumVariable('runtime',
+                        'C Runtime',
+                        'MT',
+                        allowed_values='MTd MT MD MDd'.split()) )
 
 try:
     platform = ARGUMENTS['platform']
@@ -66,7 +70,7 @@ def make_environ_vars():
 
 env = Environment( ENV = make_environ_vars(),
                    toolpath = ['scons-tools'],
-                   tools=[] ) #, tools=['default'] )
+                   tools=[], TARGET_ARCH='x86' ) #, tools=['default'] )
 
 if platform == 'suncc':
     env.Tool( 'sunc++' )
@@ -101,6 +105,12 @@ elif platform == 'msvc80':
     for tool in ['msvc', 'msvs', 'mslink', 'masm', 'mslib']:
         env.Tool( tool )
     env['CXXFLAGS']='-GR -EHsc /nologo /MT'
+elif platform == 'msvc100':
+    env['MSVS_VERSION']='10.0'
+    for tool in ['msvc', 'msvs', 'mslink', 'masm', 'mslib']:
+        env.Tool( tool )
+    #env['CXXFLAGS']='-GR -EHsc /nologo /' + ARGUMENTS['runtime']
+    env['CXXFLAGS'] = '/Gd /EHsc /nologo /Zi /O2 /Oi /Oy- /Gm- /Gy /fp:precise /Zc:wchar_t /Zc:forScope /' + ARGUMENTS['runtime']
 elif platform == 'mingw':
     env.Tool( 'mingw' )
     env.Append( CPPDEFINES=[ "WIN32", "NDEBUG", "_MT" ] )
@@ -128,7 +138,7 @@ if short_platform.startswith('msvc'):
 env['SHARED_LIB_ENABLED'] = env.get('SHARED_LIB_ENABLED', False)
 env['LIB_PLATFORM'] = short_platform
 env['LIB_LINK_TYPE'] = 'lib'    # static
-env['LIB_CRUNTIME'] = 'mt'
+env['LIB_CRUNTIME'] = ARGUMENTS['runtime'].lower()
 env['LIB_NAME_SUFFIX'] = '${LIB_PLATFORM}_${LIB_LINK_TYPE}${LIB_CRUNTIME}'  # must match autolink naming convention
 env['JSONCPP_VERSION'] = JSONCPP_VERSION
 env['BUILD_DIR'] = env.Dir(build_dir)

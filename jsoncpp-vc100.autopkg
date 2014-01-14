@@ -1,0 +1,49 @@
+nuget {
+    nuspec {
+        id = jsoncpp-vc100;
+        version : 0.5.0-r20140114;
+        title : jsoncpp;
+        authors : "Baptiste Lepilleur";
+        owners : ksmyth;
+        licenseUrl : "http://jsoncpp.sourceforge.net/LICENSE";
+        projectUrl: "http://jsoncpp.sourceforge.net/";
+        iconUrl: "https://www.nuget.org/Content/Images/packageDefaultIcon.png";
+        requireLicenseAcceptance:false;
+        summary: jsoncpp vc100;
+
+        description: @"JSON (JavaScript Object Notation) is a lightweight data-interchange format.";
+        releaseNotes: "";
+        copyright: Copyright 2013;
+        tags: { native, cpp, json, jsoncpp };
+    }
+
+    dependencies {
+        packages : {
+            jsoncpp/0.5.0-r20140114,
+        };
+    }
+
+
+    files {
+        vcpdb += {
+            // #flatten = true;
+            #destination = ${d_lib};
+        };
+
+        [win32,v100,release] { 
+            lib += libs/msvc100/json_vc100_libmd.lib;
+        }
+
+        [win32,v100,debug] { 
+            lib += libs/msvc100/json_vc100_libmdd.lib;
+        }
+
+        [x64,v100,release] { 
+            lib += x64/libs/msvc100/json_vc100_libmd.lib;
+        }
+
+        [x64,v100,debug] { 
+            lib += x64/libs/msvc100/json_vc100_libmdd.lib;
+        }
+    }
+}

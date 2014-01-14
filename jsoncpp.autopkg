@@ -1,0 +1,26 @@
+nuget {
+    nuspec {
+        id = jsoncpp;
+        version : 0.5.0-r20140114;
+        title : jsoncpp;
+        authors : "Baptiste Lepilleur";
+        owners : ksmyth;
+        licenseUrl : "http://jsoncpp.sourceforge.net/LICENSE";
+        projectUrl: "http://jsoncpp.sourceforge.net/";
+        iconUrl: "https://www.nuget.org/Content/Images/packageDefaultIcon.png";
+        requireLicenseAcceptance:false;
+        summary: jsoncpp include files;
+
+        description: @"JSON (JavaScript Object Notation) is a lightweight data-interchange format.";
+        releaseNotes: "";
+        copyright: Copyright 2013;
+        tags: { native, cpp, json, jsoncpp };
+    }
+
+   files {
+      nestedInclude : {
+         #destination = ${d_include};
+         "include\json\**",
+      };
+   }
+}
