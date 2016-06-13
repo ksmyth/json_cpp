@@ -18,7 +18,7 @@ options = Variables()
 options.Add( EnumVariable('platform',
                         'Platform (compiler/stl) used to build the project',
                         'msvc71',
-                        allowed_values='suncc vacpp mingw msvc6 msvc7 msvc71 msvc80 msvc100 linux-gcc'.split(),
+                        allowed_values='suncc vacpp mingw msvc6 msvc7 msvc71 msvc80 msvc100 msvc140 linux-gcc'.split(),
                         ignorecase=2) )
 options.Add( EnumVariable('runtime',
                         'C Runtime',
@@ -70,7 +70,7 @@ def make_environ_vars():
 
 env = Environment( ENV = make_environ_vars(),
                    toolpath = ['scons-tools'],
-                   tools=[], TARGET_ARCH='x86' ) #, tools=['default'] )
+                   tools=[], TARGET_ARCH=os.environ.get('TARGET_ARCH', 'x86')) #, tools=['default'] )
 
 if platform == 'suncc':
     env.Tool( 'sunc++' )
@@ -111,6 +111,14 @@ elif platform == 'msvc100':
         env.Tool( tool )
     #env['CXXFLAGS']='-GR -EHsc /nologo /' + ARGUMENTS['runtime']
     env['CXXFLAGS'] = '/Gd /EHsc /nologo /Zi /O2 /Oi /Oy- /Gm- /Gy /fp:precise /Zc:wchar_t /Zc:forScope /' + ARGUMENTS['runtime']
+elif platform == 'msvc140':
+    env['MSVS_VERSION']='14.0'
+    for tool in ['msvc', 'msvs', 'mslink', 'masm', 'mslib']:
+        env.Tool( tool )
+    #env['CXXFLAGS']='-GR -EHsc /nologo /' + ARGUMENTS['runtime']
+    env['CXXFLAGS'] = r'/I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt" ' + '/Gd /EHsc /nologo /Zi /O2 /Oi /Oy- /Gm- /Gy /fp:precise /Zc:wchar_t /Zc:forScope /' + ARGUMENTS['runtime']
+    env['LINKFLAGS'] = r'/LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10240.0\ucrt\{}"'.format({'amd64': 'x64'}.get(env['TARGET_ARCH'], env['TARGET_ARCH']))
+    
 elif platform == 'mingw':
     env.Tool( 'mingw' )
     env.Append( CPPDEFINES=[ "WIN32", "NDEBUG", "_MT" ] )
